@@ -86,46 +86,48 @@ class Comparer
   end
 end
 
+if __FILE__ == $0
 
+  domain1 = ""
+  domain2 = ""
 
-domain1 = ""
-domain2 = ""
+  compare_path_queue = Queue.new
+  search_link_finished = false
+  enqued_count = 0
+  compared_count = 0
+  ok_count = 0
+  ng_count = 0
 
-compare_path_queue = Queue.new
-search_link_finished = false
-enqued_count = 0
-compared_count = 0
-ok_count = 0
-ng_count = 0
-
-search_link_thread = Thread.new do
-  crawler = LinkCrawler.new(domain1, compare_path_queue)
-  crawler.crawl "/"
-  search_link_finished = true
-  enqued_count = crawler.enqued.count
-end
-
-compare_site_thread = Thread.new do
-  comparer = Comparer.new(domain1, domain2)
-  loop do
-    target_path = compare_path_queue.pop
-    result = comparer.compare(target_path)
-    p target_path
-    if result
-      p "OK"
-      ok_count += 1
-    else
-      p "NG"
-      ng_count += 1
-    end
-    compared_count += 1
-    break if search_link_finished && compare_path_queue.empty?
+  search_link_thread = Thread.new do
+    crawler = LinkCrawler.new(domain1, compare_path_queue)
+    crawler.crawl "/"
+    search_link_finished = true
+    enqued_count = crawler.enqued.count
   end
-end
 
-search_link_thread.join
-compare_site_thread.join
-p "target pages: #{enqued_count}"
-p "compared_count: #{compared_count}"
-p "OK: #{ok_count}"
-p "NG: #{ng_count}"
+  compare_site_thread = Thread.new do
+    comparer = Comparer.new(domain1, domain2)
+    loop do
+      target_path = compare_path_queue.pop
+      result = comparer.compare(target_path)
+      p target_path
+      if result
+        p "OK"
+        ok_count += 1
+      else
+        p "NG"
+        ng_count += 1
+      end
+      compared_count += 1
+      break if search_link_finished && compare_path_queue.empty?
+    end
+  end
+
+  search_link_thread.join
+  compare_site_thread.join
+  p "target pages: #{enqued_count}"
+  p "compared_count: #{compared_count}"
+  p "OK: #{ok_count}"
+  p "NG: #{ng_count}"
+
+end
