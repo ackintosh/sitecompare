@@ -1,6 +1,6 @@
 require 'rspec/core/rake_task'
 
-$:.push File.expand_path("../lib", __FILE__)
+$:.unshift File.join(File.dirname(__FILE__), '..')
 
 task :default => [:spec]
 

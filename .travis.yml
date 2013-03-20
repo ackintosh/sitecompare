@@ -3,4 +3,6 @@ rvm:
   - 1.9.3
 gemfile:
   - Gemfile
-
+script:
+  - cd spec/
+  - rspec -cfs *
